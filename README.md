@@ -9,4 +9,7 @@ These tools help You check for a malware infection through common behaviors!
 2. Run ollydbg.exe and then security-check.exe;
 
 ## And Then?
-If a malware will kill ollydbg.exe process, security-check.exe will shutdown the System to stop the infection!
+If a malware will kill ollydbg.exe or Windows Defender process, security-check.exe will shutdown the System to stop the infection!
+
+## WARNING:
+If You do not use Windows Defender, delete or comment msmpeng.exe block of code!
