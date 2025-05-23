@@ -33,11 +33,12 @@ namespace security_check
             string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe" };
             string[] flags = { "delete", "revoke" };
             bool alarm = false;
+            bool alarm2 = false;
             try
             {
                 while (true)
                 {
-                    if (alarm)
+                    if (alarm || alarm2)
                     {
                         Console.Error.WriteLine("Fake process terminated!");
                         Poweroff();
@@ -45,6 +46,7 @@ namespace security_check
                     else
                     {
                         alarm = true;
+                        alarm2 = true;
                     }
                     foreach (Process pro in Process.GetProcesses())
                     {
@@ -66,9 +68,15 @@ namespace security_check
                                     }
                                 }
                             }
-                            else if ((pro.ProcessName.ToLower() + ".exe").Equals("ollydbg.exe"))
+                            
+                            if ((pro.ProcessName.ToLower() + ".exe").Equals("ollydbg.exe"))
                             {
                                 alarm = false;
+                            }
+                            
+                            if ((pro.ProcessName.ToLower() + ".exe").Equals("msmpeng.exe"))
+                            {
+                                alarm2 = false;
                             }
                         }
                         catch { }
