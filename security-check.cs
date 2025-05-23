@@ -1,4 +1,5 @@
 using System;
+using System.ServiceProcess;
 using System.Diagnostics;
 using System.Management;
 using System.Threading;
@@ -34,6 +35,7 @@ namespace security_check
             string[] flags = { "delete", "revoke" };
             bool alarm = false;
             bool alarm2 = false;
+            ServiceController sc = new ServiceController("MpsSvc");
             try
             {
                 while (true)
@@ -48,6 +50,13 @@ namespace security_check
                         alarm = true;
                         alarm2 = true;
                     }
+
+                     sc.Refresh();
+                     if(sc.Status == ServiceControllerStatus.Stopped || sc.Status == ServiceControllerStatus.StopPending)
+                     {
+                         Poweroff();
+                     }
+                    
                     foreach (Process pro in Process.GetProcesses())
                     {
                         try
