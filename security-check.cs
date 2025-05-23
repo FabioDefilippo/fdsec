@@ -32,7 +32,7 @@ namespace security_check
         {
             Console.Error.WriteLine("Checking security...");
             string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "powershell.exe" };
-            string[] flags = { "delete", "revoke" };
+            string[] flags = { "delete", "remove" };
             bool alarm = false;
             bool alarm2 = false;
             ServiceController sc = new ServiceController("MpsSvc");
@@ -63,7 +63,7 @@ namespace security_check
                         {
                             if (Array.IndexOf(cli, pro.ProcessName.ToLower() + ".exe") >= 0)
                             {
-                                string arg = GetCommandLine(pro);
+                                string arg = GetCommandLine(pro).ToLower();
                                 if (arg != String.Empty)
                                 {
                                     foreach (string flag in flags)
