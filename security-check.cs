@@ -31,7 +31,7 @@ namespace security_check
         static void Main(string[] args)
         {
             Console.Error.WriteLine("Checking security...");
-            string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe" };
+            string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "powershell.exe" };
             string[] flags = { "delete", "revoke" };
             bool alarm = false;
             bool alarm2 = false;
