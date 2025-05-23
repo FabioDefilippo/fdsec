@@ -14,4 +14,4 @@ These tools help You check for a malware infection through common behaviors!
 If a malware will kill ollydbg.exe process, Windows Defender process or Windows Firewall service, security-check.exe will shutdown the System to stop the infection!
 
 ## WARNING:
-If You do not use Windows Defender or Windows Firewall, delete or comment "msmpeng.exe" or "MpsSvc" block of code!
+If You do not use Windows Defender or Windows Firewall, delete or comment "msmpeng.exe" or "MpsSvc" block of code or replace names with your AV!
