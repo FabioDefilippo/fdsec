@@ -35,7 +35,8 @@ namespace security_check
             string[] flags = { "delete", "remove" };
             bool alarm = false;
             bool alarm2 = false;
-            ServiceController sc = new ServiceController("MpsSvc");
+            ServiceController scmps = new ServiceController("MpsSvc");
+            ServiceController scwd = new ServiceController("WinDefend");
             try
             {
                 while (true)
@@ -60,8 +61,14 @@ namespace security_check
                         alarm2 = true;
                     }
 
-                     sc.Refresh();
-                     if(sc.Status == ServiceControllerStatus.Stopped || sc.Status == ServiceControllerStatus.StopPending)
+                     scmps.Refresh();
+                     if(scmps.Status == ServiceControllerStatus.Stopped || scmps.Status == ServiceControllerStatus.StopPending)
+                     {
+                         Poweroff();
+                     }
+
+                     scwd.Refresh();
+                     if(scwd.Status == ServiceControllerStatus.Stopped || scwd.Status == ServiceControllerStatus.StopPending)
                      {
                          Poweroff();
                      }
@@ -90,11 +97,6 @@ namespace security_check
                             if ((pro.ProcessName.ToLower() + ".exe").Equals("ollydbg.exe"))
                             {
                                 alarm = false;
-                            }
-                            
-                            if (Process.GetProcessById(DefId).HasExited)
-                            {
-                                alarm2 = false;
                             }
                         }
                         catch { }
