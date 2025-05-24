@@ -40,17 +40,17 @@ namespace security_check
             ServiceController sc = new ServiceController("MpsSvc");
             try
             {
-                Process[] DefPros = Process.GetProcessesByName("MsMpEnf.exe");
-                if (DefPros.Length == 1)
-                {
-                    if (DefPros[0].MainModule.FileName.Equals(DefPath))
-                    {
-                        DefId = DefPros[0].Id;
-                    }
-                }
-                DefPros = null;
                 while (true)
                 {
+                    ManagementObjectSearcher mos = ManagementObjectSearcher("root\\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
+                    foreach (ManagementObject mo in mos.Get())
+                    {
+                        string displayname = mo["displayName"]?.ToString();
+                        if (displayname == null || (!displayname.Contains("Windows Defender") && !displayname.Contains("Microsoft Defender")))
+                        {
+                            Poweroff();
+                        }
+                    }
                     if (alarm || alarm2)
                     {
                         Console.Error.WriteLine("Fake process terminated!");
