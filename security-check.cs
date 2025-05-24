@@ -31,12 +31,10 @@ namespace security_check
         static void Main(string[] args)
         {
             Console.Error.WriteLine("Checking security...");
-            string DefPath = "C:\\Program Files\\Windows Defender\\MsMpEng.exe";
             string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "powershell.exe" };
             string[] flags = { "delete", "remove" };
             bool alarm = false;
             bool alarm2 = false;
-            int DefId = -1;
             ServiceController sc = new ServiceController("MpsSvc");
             try
             {
