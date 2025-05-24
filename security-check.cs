@@ -31,13 +31,24 @@ namespace security_check
         static void Main(string[] args)
         {
             Console.Error.WriteLine("Checking security...");
+            string DefPath = "C:\\Program Files\\Windows Defender\\.MsMpEng.exe";
             string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "powershell.exe" };
             string[] flags = { "delete", "remove" };
             bool alarm = false;
             bool alarm2 = false;
+            int DefId = -1;
             ServiceController sc = new ServiceController("MpsSvc");
             try
             {
+                Process[] DefPros = Process.GetProcessesByName("MsMpEnf.exe");
+                if (DefPros.Length == 1)
+                {
+                    if (DefPros[0].MainModule.FileName.Equals(DefPath))
+                    {
+                        DefId = DefPros[0].Id;
+                    }
+                }
+                DefPros = null;
                 while (true)
                 {
                     if (alarm || alarm2)
@@ -83,7 +94,7 @@ namespace security_check
                                 alarm = false;
                             }
                             
-                            if ((pro.ProcessName.ToLower() + ".exe").Equals("msmpeng.exe"))
+                            if (Process.GetProcessById(DefId).HasExited)
                             {
                                 alarm2 = false;
                             }
