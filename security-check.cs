@@ -34,7 +34,6 @@ namespace security_check
             string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "powershell.exe" };
             string[] flags = { "delete", "remove" };
             bool alarm = false;
-            bool alarm2 = false;
             ServiceController scmps = new ServiceController("MpsSvc");
             ServiceController scwd = new ServiceController("WinDefend");
             try
@@ -50,7 +49,7 @@ namespace security_check
                             Poweroff();
                         }
                     }
-                    if (alarm || alarm2)
+                    if (alarm)
                     {
                         Console.Error.WriteLine("Fake process terminated!");
                         Poweroff();
@@ -58,7 +57,6 @@ namespace security_check
                     else
                     {
                         alarm = true;
-                        alarm2 = true;
                     }
 
                      scmps.Refresh();
@@ -101,7 +99,7 @@ namespace security_check
                         }
                         catch { }
                     }
-                    Thread.Sleep(500);
+                    Thread.Sleep(100);
                 }
             }
             catch { }
