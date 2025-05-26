@@ -39,13 +39,18 @@ namespace security_check
             Process.Start("shutdown", "/s /t 0");
         }
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.Error.WriteLine("Checking security...");
-            CheckServices();
-            CheckProcesses();
+            try
+            {
+                Task t1 = Task.Run(() => CheckServices());
+                Task t2 = Task.Run(() => CheckProcesses());
+                await Task.WhenAll(t1, t2);
+            }
+            catch { }
         }
-    
+        
         private static async Task CheckProcesses()
         {
             string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "powershell.exe" };
