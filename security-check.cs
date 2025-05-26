@@ -7,113 +7,136 @@ using System.Threading;
 namespace security_check
 {
     internal class Program
+{
+    private static string GetCommandLine(Process pro)
     {
-        private static string GetCommandLine(Process pro)
+        using (ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT CommandLine FORM Win32_Process WHERE ProcessId = " + pro.Id))
         {
-            using (ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT CommandLine FORM Win32_Process WHERE ProcessId = " + pro.Id))
+            using (ManagementObjectCollection moc = mos.Get())
             {
-                using (ManagementObjectCollection moc = mos.Get())
+                foreach (ManagementBaseObject mbo in moc)
                 {
-                    foreach (ManagementBaseObject mbo in moc)
-                    {
-                        return mbo["CommandLine"]?.ToString();
-                    }
+                    return mbo["CommandLine"]?.ToString();
                 }
             }
-            return String.Empty;
         }
+        return String.Empty;
+    }
 
-        private static void CheckService(ServiceController svcchk)
+    private static void CheckService(ServiceController svcchk)
+    {
+        svcchk.Refresh();
+        if (svcchk.Status == ServiceControllerStatus.Stopped || svcchk.Status == ServiceControllerStatus.StopPending)
         {
-           svcchk.Refresh();
-           if(svcchk.Status == ServiceControllerStatus.Stopped || svcchk.Status == ServiceControllerStatus.StopPending)
-           {
-                Poweroff();
-           } 
+            Console.Error.Write(svcchk.DisplayName + " service stopped");
+            Poweroff();
+            return;
         }
+    }
 
-        private static void Poweroff()
+    private static void Poweroff()
+    {
+        Process.Start("shutdown", "/s /t 9000");
+    }
+
+    static void Main(string[] args)
+    {
+        Console.Error.WriteLine("Checking security...");
+        CheckServices();
+        CheckProcesses();
+    }
+    private static async Task CheckProcesses()
+    {
+        string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "powershell.exe" };
+        string[] flags = { "delete", "remove" };
+        bool alarm = false, alarm2 = false;
+        try
         {
-            Process.Start("shutdown", "/s /t 0");
-        }
-      
-        static void Main(string[] args)
-        {
-            Console.Error.WriteLine("Checking security...");
-            string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "powershell.exe" };
-            string[] flags = { "delete", "remove" };
-            bool alarm = false;
-            ServiceController scmps = new ServiceController("MpsSvc");
-            ServiceController scwd = new ServiceController("WinDefend");
-            ServiceController scsc = new ServiceController("wscsvc");
-            ServiceController scwua = new ServiceController("wuauserv");
-            ServiceController scvss = new ServiceController("vss");
-            
-            try
+            while (true)
             {
-                while (true)
+                if (alarm || alarm2)
                 {
-                    ManagementObjectSearcher mos = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
-                    foreach (ManagementObject mo in mos.Get())
+                    Console.Error.WriteLine("Fake process terminated!");
+                    Poweroff();
+                    return;
+                }
+                else
+                {
+                    alarm = true;
+                    alarm2 = true;
+                }
+
+                ManagementObjectSearcher mos = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
+                foreach (ManagementObject mo in mos.Get())
+                {
+                    string displayname = mo["displayName"]?.ToString();
+                    if (displayname != null || (displayname.Contains("Windows Defender") || displayname.Contains("Microsoft Defender")))
                     {
-                        string displayname = mo["displayName"]?.ToString();
-                        if (displayname == null || (!displayname.Contains("Windows Defender") && !displayname.Contains("Microsoft Defender")))
+                        alarm2 = false;
+                    }
+                }
+
+                foreach (Process pro in Process.GetProcesses())
+                {
+                    try
+                    {
+                        if (Array.IndexOf(cli, pro.ProcessName.ToLower() + ".exe") >= 0)
                         {
-                            Poweroff();
-                        }
-                    }
-                    if (alarm)
-                    {
-                        Console.Error.WriteLine("Fake process terminated!");
-                        Poweroff();
-                    }
-                    else
-                    {
-                        alarm = true;
-                    }
-
-                     CheckService(scmps);
-                     
-                     CheckService(scwd);
-
-                    CheckService(scsc);
-
-                    CheckService(scwua);
-
-                    CheckService(scvss);
-                    
-                    foreach (Process pro in Process.GetProcesses())
-                    {
-                        try
-                        {
-                            if (Array.IndexOf(cli, pro.ProcessName.ToLower() + ".exe") >= 0)
+                            string arg = GetCommandLine(pro).ToLower();
+                            if (arg != String.Empty)
                             {
-                                string arg = GetCommandLine(pro).ToLower();
-                                if (arg != String.Empty)
+                                foreach (string flag in flags)
                                 {
-                                    foreach (string flag in flags)
+                                    if (arg.Contains(flag))
                                     {
-                                        if (arg.Contains(flag))
-                                        {
-                                            Console.Error.WriteLine("Attempting to delete backups!");
-                                            Poweroff();
-                                            return;
-                                        }
+                                        Console.Error.WriteLine("Attempting to delete backups!");
+                                        Poweroff();
+                                        return;
                                     }
                                 }
                             }
-                            
-                            if ((pro.ProcessName.ToLower() + ".exe").Equals("ollydbg.exe"))
-                            {
-                                alarm = false;
-                            }
                         }
-                        catch { }
+
+                        if ((pro.ProcessName.ToLower() + ".exe").Equals("ollydbg.exe"))
+                        {
+                            alarm = false;
+                        }
                     }
-                    Thread.Sleep(100);
+                    catch { }
                 }
+                Thread.Sleep(100);
             }
-            catch { }
         }
+        catch { }
     }
+    private static async Task CheckServices() {
+        
+        
+        ServiceController scmps = new ServiceController("MpsSvc");
+        ServiceController scwd = new ServiceController("WinDefend");
+        ServiceController scsc = new ServiceController("wscsvc");
+        ServiceController scwua = new ServiceController("wuauserv");
+        ServiceController scvss = new ServiceController("VSS");
+
+        try
+        {
+            while (true)
+            {
+               
+                CheckService(scmps);
+
+                CheckService(scwd);
+
+                CheckService(scsc);
+
+                CheckService(scwua);
+
+                CheckService(scvss);
+
+                Thread.Sleep(100);
+            }
+        }
+        catch { }
+    }
+}
 }
