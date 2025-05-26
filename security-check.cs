@@ -53,7 +53,7 @@ namespace security_check
             {
                 while (true)
                 {
-                    ManagementObjectSearcher mos = ManagementObjectSearcher("root\\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
+                    ManagementObjectSearcher mos = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
                     foreach (ManagementObject mo in mos.Get())
                     {
                         string displayname = mo["displayName"]?.ToString();
