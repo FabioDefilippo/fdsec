@@ -47,7 +47,7 @@ namespace security_check
             ServiceController scwd = new ServiceController("WinDefend");
             ServiceController scsc = new ServiceController("wscsvc");
             ServiceController scwua = new ServiceController("wuauserv");
-            ServiceController scvss = new ServiceController("vss");
+            ServiceController scvss = new ServiceController("vssvc");
             
             try
             {
