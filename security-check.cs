@@ -23,6 +23,15 @@ namespace security_check
             return String.Empty;
         }
 
+        private static void CheckService(ServiceController svcchk)
+        {
+           svcchk.Refresh();
+           if(svcchk.Status == ServiceControllerStatus.Stopped || svcchk.Status == ServiceControllerStatus.StopPending)
+           {
+                Poweroff();
+           } 
+        }
+
         private static void Poweroff()
         {
             Process.Start("shutdown", "/s /t 0");
@@ -36,6 +45,10 @@ namespace security_check
             bool alarm = false;
             ServiceController scmps = new ServiceController("MpsSvc");
             ServiceController scwd = new ServiceController("WinDefend");
+            ServiceController scsc = new ServiceController("wscsvc");
+            ServiceController scwua = new ServiceController("wuauserv");
+            ServiceController scvss = new ServiceController("vss");
+            
             try
             {
                 while (true)
@@ -59,17 +72,15 @@ namespace security_check
                         alarm = true;
                     }
 
-                     scmps.Refresh();
-                     if(scmps.Status == ServiceControllerStatus.Stopped || scmps.Status == ServiceControllerStatus.StopPending)
-                     {
-                         Poweroff();
-                     }
+                     CheckService(scmps);
+                     
+                     CheckService(scwd);
 
-                     scwd.Refresh();
-                     if(scwd.Status == ServiceControllerStatus.Stopped || scwd.Status == ServiceControllerStatus.StopPending)
-                     {
-                         Poweroff();
-                     }
+                    CheckService(scsc);
+
+                    CheckService(scwua);
+
+                    CheckService(scvss);
                     
                     foreach (Process pro in Process.GetProcesses())
                     {
