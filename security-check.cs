@@ -36,7 +36,7 @@ namespace security_check
 
     private static void Poweroff()
     {
-        Process.Start("shutdown", "/s /t 9000");
+        Process.Start("shutdown", "/s /t 0");
     }
 
     static void Main(string[] args)
