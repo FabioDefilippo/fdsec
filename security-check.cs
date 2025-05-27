@@ -80,7 +80,7 @@ namespace security_check
                         {
                             alarm2 = false;
                         }
-                        else if (mo["State"].ToString().Equals("Running"))
+                        else if (mo["State"].ToString().ToLower().Equals("running"))
                         {
                             alarm2 = false;
                         }
