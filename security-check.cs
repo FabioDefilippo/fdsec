@@ -54,7 +54,7 @@ namespace security_check
         private static async Task CheckProcesses()
         {
             string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "wevtutil", "powershell.exe" };
-            string[] flags = { "delete", "remove", "clear-eventlog", "cl"};
+            string[] flags = { "delete", "remove", "clear-eventlog", "cl" };
             bool alarm = false, alarm2 = false;
             try
             {
