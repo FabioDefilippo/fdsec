@@ -53,8 +53,8 @@ namespace security_check
         
         private static async Task CheckProcesses()
         {
-            string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "powershell.exe" };
-            string[] flags = { "delete", "remove" };
+            string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "wevtutil", "powershell.exe" };
+            string[] flags = { "delete", "remove", "clear-eventlog", "cl"};
             bool alarm = false, alarm2 = false;
             try
             {
@@ -105,7 +105,7 @@ namespace security_check
                                 {
                                     foreach (string flag in flags)
                                     {
-                                        if (arg.Contains(flag))
+                                        if (arg.Contains(flag.ToLower()))
                                         {
                                             Console.Error.WriteLine("Attempting to delete backups!");
                                             Poweroff();
