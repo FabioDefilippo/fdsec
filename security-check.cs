@@ -80,6 +80,10 @@ namespace security_check
                         {
                             alarm2 = false;
                         }
+                        else if (mo["State"].ToString().Equals("Running"))
+                        {
+                            alarm2 = false;
+                        }
                     }
 
                     foreach (Process pro in Process.GetProcesses())
