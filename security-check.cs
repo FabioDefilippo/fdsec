@@ -85,6 +85,15 @@ namespace security_check
                         }
                     }
 
+                    mos = new ManagementObjectSearcher("SELECT * FROM Win32_Service WHERE Name = 'EventLog'");
+                    foreach (ManagementObject mo in mos.Get())
+                    {
+                        if (mo["State"].ToString().ToLower().Equals("running"))
+                        {
+                            alarm2 = false;
+                        }
+                    }
+
                     foreach (Process pro in Process.GetProcesses())
                     {
                         try
