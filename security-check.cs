@@ -78,12 +78,10 @@ namespace security_check
                         string displayname = mo["displayName"]?.ToString();
                         if (displayname != null || (displayname.Contains("Windows Defender") || displayname.Contains("Microsoft Defender")))
                         {
-                            alarm2 = false;
-                        }
-                        
-                        if (mo["State"].ToString().ToLower().Equals("running"))
-                        {
-                            alarm2 = false;
+                            if (mo["State"].ToString().ToLower().Equals("running"))
+                            {
+                                alarm2 = false;
+                            }
                         }
                     }
 
