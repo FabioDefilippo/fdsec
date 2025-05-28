@@ -10,7 +10,7 @@ namespace security_check
 {
     internal class Program
     {
-        private static string GetCommandLine(Process pro)
+        private static string GetCommandLine(Process pro) //GET COMMAND LINE FROM PROCESS
         {
             using (ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT CommandLine FORM Win32_Process WHERE ProcessId = " + pro.Id))
             {
@@ -27,8 +27,8 @@ namespace security_check
 
         private static void CheckService(ServiceController svcchk)
         {
-            svcchk.Refresh();
-            if (svcchk.Status == ServiceControllerStatus.Stopped || svcchk.Status == ServiceControllerStatus.StopPending)
+            svcchk.Refresh(); //REFRESH SERVICE STATE
+            if (svcchk.Status == ServiceControllerStatus.Stopped || svcchk.Status == ServiceControllerStatus.StopPending) //CHECK IF A SERVICE IS STOPPING OR STOPPED
             {
                 Console.Error.Write(svcchk.DisplayName + " service stopped");
                 Poweroff();
@@ -38,7 +38,7 @@ namespace security_check
 
         private static void Poweroff()
         {
-            Process.Start("shutdown", "/s /f /t 0");
+            Process.Start("shutdown", "/s /f /t 0"); //SHUTDOWN THE OS IMMEDIATELY
         }
 
         static async Task Main(string[] args)
@@ -55,9 +55,9 @@ namespace security_check
         
         private static async Task CheckProcesses()
         {
-            string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "wevtutil", "auditpol.exe", "powershell.exe" };
-            string[] flags = { "delete", "remove", "clear-eventlog", "cl", "disable", "eventlog" };
-            bool alarm1 = false, alarm2 = false, alarm3 = false;
+            string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "wevtutil", "auditpol.exe", "powershell.exe" }; //ALL BINARIES COULD DELETE SHADOW COPIES, LOGS AND BACKUPS
+            string[] flags = { "delete", "remove", "clear-eventlog", "cl", "disable", "eventlog" }; //FLAGS IN COMMAND LINES DELETING, REMOVING OR DISABLING SHADOW COPIES, BACKUPS AND LOGS
+            bool alarm1 = false, alarm2 = false, alarm3 = false; //ALARMS FOR CONDITIONS
             ManagementObjectSearcher mos;
             string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToLower();
             WindowsIdentity wi;
@@ -66,13 +66,13 @@ namespace security_check
             {
                 while (true)
                 {
-                    if (alarm1 || alarm2 || alarm3)
+                    if (alarm1 || alarm2 || alarm3) //HERE WE CAN CHOOSE CONDITIONS TO SHUTDOWN THE OS
                     {
                         Console.Error.WriteLine("Fake process terminated!");
                         Poweroff();
                         return;
                     }
-                    else
+                    else //SET ALARMS TO CHECK NEGATIVE CONDITIONS
                     {
                         alarm1 = true;
                         alarm2 = true;
@@ -92,7 +92,7 @@ namespace security_check
                         }
                     }
 
-                    mos = new ManagementObjectSearcher("SELECT * FROM Win32_Service WHERE Name = 'EventLog'");
+                    mos = new ManagementObjectSearcher("SELECT * FROM Win32_Service WHERE Name = 'EventLog'"); //CHECK LOG SERVICE
                     foreach (ManagementObject mo in mos.Get())
                     {
                         if (mo["State"].ToString().ToLower().Equals("running"))
@@ -101,13 +101,13 @@ namespace security_check
                         }
                     }
 
-                    foreach (Process pro in Process.GetProcesses())
+                    foreach (Process pro in Process.GetProcesses()) //CHECK ALL PROCESSES
                     {
                         try
                         {
                             wi = new WindowsIdentity(pro.Handle);
                             wp = new WindowsPrincipal(wi);
-
+                            //CHECK IF A PROCESS FROM APPADATA PATH HAS ADMIN PRIVILEGES
                             if (wp.IsInRole(WindowsBuiltInRole.Administrator) && pro.MainModule.FileName.ToLower().StartsWith(AppDataPath, StringComparison.OrdinalIgnoreCase))
                             {
                                 alarm3 = true;
@@ -118,7 +118,7 @@ namespace security_check
                                 string arg = GetCommandLine(pro).ToLower();
                                 if (arg != String.Empty)
                                 {
-                                    foreach (string flag in flags)
+                                    foreach (string flag in flags) //CHECK IF THERE IS A PROCESS DELETING OR REMOVING SHADOW COPIES OR DISABLING LOG
                                     {
                                         if (arg.Contains(flag.ToLower()))
                                         {
@@ -130,7 +130,7 @@ namespace security_check
                                 }
                             }
                             
-                            if ((pro.ProcessName.ToLower() + ".exe").Equals("ollydbg.exe"))
+                            if ((pro.ProcessName.ToLower() + ".exe").Equals("ollydbg.exe")) //CHECK IF FAKE PROCESS IS RUNNING
                             {
                                 alarm1 = false;
                             }
@@ -143,7 +143,7 @@ namespace security_check
             catch { }
         }
         
-        private static async Task CheckServices()
+        private static async Task CheckServices() //CHECK IF DEFENDER, FIREWALL, UPDATES, SHADOW COPIES AND OTHER IMPORTANT SERVICES ARE RUNNING
         {
             ServiceController scmps = new ServiceController("MpsSvc");
             ServiceController scwd = new ServiceController("WinDefend");
