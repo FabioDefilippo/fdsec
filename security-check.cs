@@ -160,9 +160,9 @@ namespace security_check
                                 alarm1 = false;
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception ey)
                         {
-                            PrintErr(ex.Message);
+                            PrintErr(ey.Message);
                         }
                     }
                     Thread.Sleep(100);
