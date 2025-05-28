@@ -113,7 +113,7 @@ namespace security_check
                     foreach (ManagementObject mo in mos.Get())
                     {
                         string displayname = mo["displayName"]?.ToString();
-                        if (displayname != null || (displayname.Contains("Windows Defender") || displayname.Contains("Microsoft Defender")))
+                        if (displayname != null && (displayname.Contains("Windows Defender") || displayname.Contains("Microsoft Defender")))
                         {
                             if (mo["State"].ToString().ToLower().Equals("running"))
                             {
