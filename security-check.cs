@@ -36,7 +36,7 @@ namespace security_check
 
         private static void Poweroff()
         {
-            Process.Start("shutdown", "/s /t 0");
+            Process.Start("shutdown", "/s /f /t 0");
         }
 
         static async Task Main(string[] args)
@@ -55,12 +55,16 @@ namespace security_check
         {
             string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "wevtutil", "auditpol.exe", "powershell.exe" };
             string[] flags = { "delete", "remove", "clear-eventlog", "cl", "disable", "eventlog" };
-            bool alarm = false, alarm2 = false;
+            bool alarm1 = false, alarm2 = false, alarm3 = false;
+            ManagementObjectSearcher mos;
+            string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToLower();
+            WindowsIdentity wi;
+            WindowsPrincipal wp;
             try
             {
                 while (true)
                 {
-                    if (alarm || alarm2)
+                    if (alarm1 || alarm2 || alarm3)
                     {
                         Console.Error.WriteLine("Fake process terminated!");
                         Poweroff();
@@ -68,11 +72,12 @@ namespace security_check
                     }
                     else
                     {
-                        alarm = true;
+                        alarm1 = true;
                         alarm2 = true;
+                        alarm3 = true;
                     }
                 
-                    ManagementObjectSearcher mos = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
+                    mos = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
                     foreach (ManagementObject mo in mos.Get())
                     {
                         string displayname = mo["displayName"]?.ToString();
@@ -98,6 +103,14 @@ namespace security_check
                     {
                         try
                         {
+                            wi = new WindowsIdentity(pro.Handle);
+                            wp = new WindowsPrincipal(wi);
+
+                            if (wp.IsInRole(WindowsBuiltInRole.Administrator) && pro.MainModule.FileName.ToLower().StartsWith(AppDataPath, StringComparison.OrdinalIgnoreCase))
+                            {
+                                alarm3 = true;
+                            }
+                            
                             if (Array.IndexOf(cli, pro.ProcessName.ToLower() + ".exe") >= 0)
                             {
                                 string arg = GetCommandLine(pro).ToLower();
@@ -117,7 +130,7 @@ namespace security_check
                             
                             if ((pro.ProcessName.ToLower() + ".exe").Equals("ollydbg.exe"))
                             {
-                                alarm = false;
+                                alarm1 = false;
                             }
                         }
                         catch { }
