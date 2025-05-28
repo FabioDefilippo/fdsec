@@ -12,33 +12,54 @@ namespace security_check
     {
         private static string GetCommandLine(Process pro) //GET COMMAND LINE FROM PROCESS
         {
-            using (ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT CommandLine FORM Win32_Process WHERE ProcessId = " + pro.Id))
+            try
             {
-                using (ManagementObjectCollection moc = mos.Get())
+                using (ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT CommandLine FORM Win32_Process WHERE ProcessId = " + pro.Id))
                 {
-                    foreach (ManagementBaseObject mbo in moc)
+                    using (ManagementObjectCollection moc = mos.Get())
                     {
-                        return mbo["CommandLine"]?.ToString();
+                        foreach (ManagementBaseObject mbo in moc)
+                        {
+                            return mbo["CommandLine"]?.ToString();
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                PrintErr(ex.Message);
             }
             return String.Empty;
         }
 
         private static void CheckService(ServiceController svcchk)
         {
-            svcchk.Refresh(); //REFRESH SERVICE STATE
-            if (svcchk.Status == ServiceControllerStatus.Stopped || svcchk.Status == ServiceControllerStatus.StopPending) //CHECK IF A SERVICE IS STOPPING OR STOPPED
+            try
             {
-                Console.Error.Write(svcchk.DisplayName + " service stopped");
-                Poweroff();
-                return;
+                svcchk.Refresh(); //REFRESH SERVICE STATE
+                if (svcchk.Status == ServiceControllerStatus.Stopped || svcchk.Status == ServiceControllerStatus.StopPending) //CHECK IF A SERVICE IS STOPPING OR STOPPED
+                {
+                    Console.Error.Write(svcchk.DisplayName + " service stopped");
+                    Poweroff();
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                PrintErr(ex.Message);
             }
         }
 
         private static void Poweroff()
         {
-            Process.Start("shutdown", "/s /f /t 0"); //SHUTDOWN THE OS IMMEDIATELY
+            try
+            {
+                Process.Start("shutdown", "/s /f /t 0"); //SHUTDOWN THE OS IMMEDIATELY
+            }
+            catch (Exception ex)
+            {
+                PrintErr(ex.Message);
+            }
         }
 
         static async Task Main(string[] args)
@@ -50,11 +71,16 @@ namespace security_check
                 Task t2 = Task.Run(() => CheckProcesses());
                 await Task.WhenAll(t1, t2);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                PrintErr(ex.Message);
+            }
         }
         
         private static async Task CheckProcesses()
         {
+            try
+            {
             string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "wevtutil", "auditpol.exe", "powershell.exe" }; //ALL BINARIES COULD DELETE SHADOW COPIES, LOGS AND BACKUPS
             string[] flags = { "delete", "remove", "clear-eventlog", "cl", "disable", "eventlog" }; //FLAGS IN COMMAND LINES DELETING, REMOVING OR DISABLING SHADOW COPIES, BACKUPS AND LOGS
             bool alarm1 = false, alarm2 = false, alarm3 = false; //ALARMS FOR CONDITIONS
@@ -62,8 +88,7 @@ namespace security_check
             string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToLower();
             WindowsIdentity wi;
             WindowsPrincipal wp;
-            try
-            {
+
                 while (true)
                 {
                     if (alarm1 || alarm2 || alarm3) //HERE WE CAN CHOOSE CONDITIONS TO SHUTDOWN THE OS
@@ -135,12 +160,18 @@ namespace security_check
                                 alarm1 = false;
                             }
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {
+                            PrintErr(ex.Message);
+                        }
                     }
                     Thread.Sleep(100);
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                PrintErr(ex.Message);
+            }
         }
         
         private static async Task CheckServices() //CHECK IF DEFENDER, FIREWALL, UPDATES, SHADOW COPIES AND OTHER IMPORTANT SERVICES ARE RUNNING
@@ -169,7 +200,10 @@ namespace security_check
                     Thread.Sleep(100);
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                PrintErr(ex.Message);
+            }
         }
     }
 }
