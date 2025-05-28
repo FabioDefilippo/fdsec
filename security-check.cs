@@ -44,7 +44,7 @@ namespace security_check
                 svcchk.Refresh(); //REFRESH SERVICE STATE
                 if (svcchk.Status == ServiceControllerStatus.Stopped || svcchk.Status == ServiceControllerStatus.StopPending) //CHECK IF A SERVICE IS STOPPING OR STOPPED
                 {
-                    Console.Error.Write(svcchk.DisplayName + " service stopped");
+                    PrintErr(svcchk.DisplayName + " service stopped");
                     Poweroff();
                     return;
                 }
@@ -69,7 +69,7 @@ namespace security_check
 
         static async Task Main(string[] args)
         {
-            Console.Error.WriteLine("Checking security...");
+            PrintErr("Checking security...");
             try
             {
                 Task t1 = Task.Run(() => CheckServices());
@@ -98,7 +98,7 @@ namespace security_check
                 {
                     if (alarm1 || alarm2 || alarm3) //HERE WE CAN CHOOSE CONDITIONS TO SHUTDOWN THE OS
                     {
-                        Console.Error.WriteLine("Fake process terminated!");
+                        PrintErr("Fake process terminated!");
                         Poweroff();
                         return;
                     }
@@ -115,10 +115,15 @@ namespace security_check
                         string displayname = mo["displayName"]?.ToString();
                         if (displayname != null && (displayname.Contains("Windows Defender") || displayname.Contains("Microsoft Defender")))
                         {
-                            if (mo["State"].ToString().ToLower().Equals("running"))
+                            try
                             {
-                                alarm2 = false;
+                                if (mo["State"].ToString().ToLower().Equals("running"))
+                                {
+                                    alarm2 = false;
+                                }
                             }
+                            catch {}
+                            alarm2 = false;
                         }
                     }
 
@@ -152,7 +157,7 @@ namespace security_check
                                     {
                                         if (arg.Contains(flag.ToLower()))
                                         {
-                                            Console.Error.WriteLine("Attempting to delete backups!");
+                                            PrintErr("Attempting to delete backups!");
                                             Poweroff();
                                             return;
                                         }
