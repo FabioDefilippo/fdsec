@@ -181,8 +181,7 @@ namespace security_check
             ServiceController scsc = new ServiceController("wscsvc");
             ServiceController scwua = new ServiceController("wuauserv");
             ServiceController scvss = new ServiceController("VSS");
-            ServiceController scuac = new ServiceController("uacsvc");
-
+            
             try
             {
                 while (true)
@@ -197,8 +196,6 @@ namespace security_check
                     CheckService(scwua);
 
                     CheckService(scvss);
-
-                    CheckService(scuac);
                 
                     Thread.Sleep(100);
                 }
