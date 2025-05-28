@@ -1,8 +1,10 @@
 using System;
+using System.Security.Principal;
 using System.ServiceProcess;
 using System.Diagnostics;
 using System.Management;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace security_check
 {
