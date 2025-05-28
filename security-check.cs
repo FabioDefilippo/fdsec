@@ -81,8 +81,8 @@ namespace security_check
         {
             try
             {
-            string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "wevtutil", "auditpol.exe", "net.exe", "powershell.exe" }; //ALL BINARIES COULD DELETE SHADOW COPIES, LOGS AND BACKUPS
-            string[] flags = { "delete", "remove", "clear-eventlog", "cl", "disable", "eventlog", "stop" }; //FLAGS IN COMMAND LINES DELETING, REMOVING OR DISABLING SHADOW COPIES, BACKUPS AND LOGS
+            string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "wevtutil", "auditpol.exe", "net.exe", "sc.exe", "powershell.exe" }; //ALL BINARIES COULD DELETE SHADOW COPIES, LOGS AND BACKUPS
+            string[] flags = { "delete", "remove", "clear-eventlog", "cl", "disable", "eventlog", "stop", "pause" }; //FLAGS IN COMMAND LINES DELETING, REMOVING OR DISABLING SHADOW COPIES, BACKUPS AND LOGS
             bool alarm1 = false, alarm2 = false, alarm3 = false; //ALARMS FOR CONDITIONS
             ManagementObjectSearcher mos;
             string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToLower();
