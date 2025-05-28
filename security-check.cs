@@ -10,6 +10,11 @@ namespace security_check
 {
     internal class Program
     {
+        private static void PrintErr(string error)
+        {
+            Console.Error.WriteLine(error);
+        }
+        
         private static string GetCommandLine(Process pro) //GET COMMAND LINE FROM PROCESS
         {
             try
