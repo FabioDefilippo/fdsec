@@ -14,13 +14,13 @@ These tools help You check for a malware infection through common behaviors!
 This tool will shutdown the OS based on at least one of these conditions:
 
 - ollydbg.exe process killed (malwares kill debugger softwares at the execution);
-- Windows Defender process/service (as above);
+- Windows Defender process/service (malwares kill security and important services);
 - Windows Firewall service (as above);
-- Shadow copies service (as above);
+- Shadow copies service (malwares stop backups routine);
 - Windows update service;
 - Windows security center;
-- delete backups and Shadow copies command lines;
-- a process with administrator privileges run from a subdirectory in AppData path;
+- delete backups and Shadow copies command lines (malwares delete backups to avoid recovery files);
+- a process with administrator privileges run from a subdirectory in AppData path (malwares need have admin privileges to works better);
 
 security-check.exe will shutdown the System to stop the infection!
 
