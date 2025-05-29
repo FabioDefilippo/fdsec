@@ -1,5 +1,5 @@
 # fdsec
-Some security tools!
+Tool to improve security in Windows!
 
 ## What is it?
 These tools help You check for a malware infection through common behaviors!
@@ -27,4 +27,4 @@ security-check.exe will shutdown the System to stop the infection!
 ## WARNING:
 - If You do not use Windows Defender or Windows Firewall, delete or comment "msmpeng.exe" or "MpsSvc" block of code or replace names with your AV!
 - You can rename "ollydbg" project to another name, but You must change the name in "Security-Check" project!
-- this code check other services, please che them all in Your Windows!
+- this code check other services, please verify in code which ones interest you and run them all in Your Windows!
