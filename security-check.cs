@@ -86,8 +86,8 @@ namespace security_check
         {
             try
             {
-            string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "wevtutil", "auditpol.exe", "net.exe", "sc.exe", "powershell.exe" }; //ALL BINARIES COULD DELETE SHADOW COPIES, LOGS AND BACKUPS
-            string[] flags = { "delete", "remove", "clear-eventlog", "cl", "disable", "eventlog", "stop", "pause" }; //FLAGS IN COMMAND LINES DELETING, REMOVING OR DISABLING SHADOW COPIES, BACKUPS AND LOGS
+            string[] cli = { "vssadmin.exe", "wbadmin.exe", "diskshadow.exe", "wmic.exe", "wevtutil", "auditpol.exe", "fsutil.exe", "net.exe", "sc.exe", "powershell.exe" }; //ALL BINARIES COULD DELETE SHADOW COPIES, LOGS AND BACKUPS
+            string[] flags = { "delete", "remove", "clear-eventlog", "cl", "disable", "eventlog", "stop", "pause", "setzerodata" }; //FLAGS IN COMMAND LINES DELETING, REMOVING OR DISABLING SHADOW COPIES, BACKUPS AND LOGS
             bool alarm1 = false, alarm2 = false, alarm3 = false; //ALARMS FOR CONDITIONS
             ManagementObjectSearcher mos;
             string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToLower();
@@ -147,10 +147,11 @@ namespace security_check
                             {
                                 alarm3 = true;
                             }
-                            
-                            if (Array.IndexOf(cli, pro.ProcessName.ToLower() + ".exe") >= 0)
+
+                            string tcommandline = pro.ProcessName.ToLower() + ".exe";
+                            string arg = GetCommandLine(pro).ToLower();
+                            if (Array.IndexOf(cli, tcommandline) >= 0)
                             {
-                                string arg = GetCommandLine(pro).ToLower();
                                 if (arg != String.Empty)
                                 {
                                     foreach (string flag in flags) //CHECK IF THERE IS A PROCESS DELETING OR REMOVING SHADOW COPIES OR DISABLING LOG
@@ -161,6 +162,16 @@ namespace security_check
                                             Poweroff();
                                             return;
                                         }
+                                    }
+                                }
+                            }
+                            else if (tcommandline.Equals("del.exe"))
+                            {
+                                if (arg.Contains("/f") && arg.Contains("/s") && arg.Contains("/q"))
+                                {
+                                    if (arg.IndexOf('*') > -1)
+                                    {
+                                        Poweroff();
                                     }
                                 }
                             }
