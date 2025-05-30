@@ -165,7 +165,7 @@ namespace security_check
                                     }
                                 }
                             }
-                            else if (tcommandline.Equals("del.exe"))
+                            else if (tcommandline.Equals("del.exe")) // CHECK IF A MALWARE RUNS DEL /F /S /Q * COMMANDLINE
                             {
                                 if (arg.Contains("/f") && arg.Contains("/s") && arg.Contains("/q"))
                                 {
