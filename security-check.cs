@@ -104,9 +104,9 @@ namespace security_check
                     }
                     else //SET ALARMS TO CHECK NEGATIVE CONDITIONS
                     {
-                        alarm1 = true;
-                        alarm2 = true;
-                        alarm3 = true;
+                        alarm1 = true; //FAKE PROCESS KILLED
+                        alarm2 = true; //DEFENDER AND EVENTLOG
+                        alarm3 = true; //ADMIN PRIVILEGES IN APPDATA
                     }
                 
                     mos = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
