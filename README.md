@@ -17,9 +17,9 @@ This tool will shutdown the OS based on at least one of these conditions:
 - Windows Defender process/service (malwares kill security and important services);
 - Windows Firewall service (as above);
 - Shadow copies service (malwares stop backups routine);
-- Windows update service;
-- Windows security center;
-- delete backups and Shadow copies command lines (malwares delete backups to avoid recovery files);
+- Windows update service killed;
+- Windows security center killed;
+- delete backups and Shadow copies by command lines (malwares delete backups to avoid recovery files);
 - a process with administrator privileges run from a subdirectory in AppData path (malwares need have admin privileges to works better);
 
 security-check.exe will shutdown the System to stop the infection!
