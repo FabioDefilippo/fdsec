@@ -175,6 +175,13 @@ namespace security_check
                                     }
                                 }
                             }
+                            else if (tcommandline.Equals("rmdir.exe")) // CHECK IF A MALWARE RUNS RMDIR /S /Q COMMANDLINE
+                            {
+                                if (arg.Contains("/s") && arg.Contains("/q"))
+                                {
+                                    Poweroff();
+                                }
+                            }
                             
                             if ((pro.ProcessName.ToLower() + ".exe").Equals("ollydbg.exe")) //CHECK IF FAKE PROCESS IS RUNNING
                             {
