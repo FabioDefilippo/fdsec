@@ -2,7 +2,7 @@
 Tool to improve security in Windows!
 
 ## WARNING:
-<strong>THIS TOOL SHUTDOWN YOUR SYSTEM IMMEDIATELY WHEN IT FIND A INFECTION BEHAVIOUR.</strong>
+<strong>THIS TOOL WILL SHUTDOWN YOUR SYSTEM IMMEDIATELY WHEN IT FIND A INFECTION BEHAVIOUR.</strong>
 
 ## What is it?
 These tools help You check for a malware infection through common behaviors!
