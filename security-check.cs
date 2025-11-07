@@ -19,7 +19,7 @@ namespace security_check
         {
             try
             {
-                using (ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT CommandLine FORM Win32_Process WHERE ProcessId = " + pro.Id))
+                using (ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT CommandLine FROM Win32_Process WHERE ProcessId = " + pro.Id))
                 {
                     using (ManagementObjectCollection moc = mos.Get())
                     {
